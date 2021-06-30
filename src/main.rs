@@ -185,6 +185,8 @@ impl LampState {
     }
 }
 
+type SharedLampState = Arc<Mutex<LampState>>;
+
 // Load Lamp definitions
 fn load_lamps() -> Arc<Mutex<LampState>> {
     let bar_file = "bar.json";
@@ -261,7 +263,8 @@ struct TemplateContext<'a> {
 
 // generate html page for each lamp from template
 #[get("/<name>")]
-async fn index_lamp(name: &str, data: &State<LampState>) -> Result<Template, Status> {
+async fn index_lamp(name: &str, data: &State<SharedLampState>) -> Result<Template, Status> {
+    let data = data.lock().await;
     if let Some(lamp) = data.get_lamp(name) {
         let context = {
             let data = lamp.data.write().await;
@@ -307,8 +310,9 @@ async fn update_lamp(
     name: &str,
     key: &str,
     value: String,
-    sdata: &State<LampState>,
+    sdata: &State<SharedLampState>,
 ) -> Result<Json<LampData>, Status> {
+    let sdata = sdata.lock().await;
     if let Some(lamp) = sdata.get_lamp(name) {
         let mut data = lamp.data.write().await;
         match key {
