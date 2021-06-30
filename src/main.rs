@@ -1,3 +1,7 @@
+// Lightcontroller
+// SPDX-License-Identifier: MIT License
+// Copyright (C) 2021 Alexander Schrode
+
 #[macro_use]
 extern crate rocket;
 
