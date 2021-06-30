@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket::fs::{relative, FileServer};
+use rocket::fs::FileServer;
 use rocket::http::Status;
 use rocket::log::warn_;
 use rocket::serde::json::{serde_json, Json};
@@ -12,6 +12,8 @@ use rocket_dyn_templates::Template;
 use rumqttc::{AsyncClient, MqttOptions, QoS};
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
+#[cfg(debug_assertions)]
+use simplelog::{Config, LevelFilter, WriteLogger};
 use std::convert::TryFrom;
 use std::fs::File;
 use std::sync::Arc;
@@ -170,9 +172,9 @@ impl LampState {
                                     c.publish(topic, QOS, false, payload).await.unwrap();
                                 }
                             }
-                            _ => println!("Received = {:?}", nf),
+                            _ => info!("Received = {:?}", nf),
                         },
-                        rumqttc::Event::Outgoing(_) => println!("Received = {:?}", notification),
+                        rumqttc::Event::Outgoing(_) => info!("Received = {:?}", notification),
                     },
                     Err(e) => {
                         error!("Mqtt connection erro: {}", e);
@@ -274,7 +276,6 @@ async fn index_lamp(name: &str, data: &State<SharedLampState>) -> Result<Templat
                 .iter()
                 .find_map(|m| if cur == m.value { Some(m.value) } else { None })
                 .unwrap_or(0);
-            println!("{}", activemode);
             TemplateContext {
                 title: lamp.title.as_str(),
                 modes: &lamp.modes,
@@ -342,7 +343,7 @@ async fn update_lamp(
                 }
             }
             _ => {
-                warn_!("Unkown Key{}", key);
+                warn_!("Unkown Key {}", key);
             }
         }
 
@@ -366,11 +367,13 @@ async fn update_lamp(
 
 #[launch]
 fn rocket() -> _ {
+    #[cfg(debug_assertions)]
+    WriteLogger::init(LevelFilter::Warn, Config::default(), File::create("log.log").unwrap()).unwrap();
     let lamps = load_lamps();
 
     rocket::build()
         .mount("/", routes![index, index_lamp, update_lamp])
-        .mount("/static", FileServer::from(relative!("static")))
+        .mount("/static", FileServer::from("static"))
         .manage(lamps)
         .attach(Template::custom(|_engines| {}))
 }
