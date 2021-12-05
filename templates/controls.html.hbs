@@ -47,7 +47,7 @@
         .radio-toolbar input[type="radio"]:checked + label {
             background-color:#00c3ff;
         }
-        
+
     </style>
      <script>
         if (window.matchMedia &&
@@ -82,7 +82,7 @@
                 </div>
             </div>
       </div>
-      <script> 
+      <script>
         function to_rgb(argb) {
             return '#' + argb[0].toString(16).padStart(2, 0) + argb[1].toString(16).padStart(2, 0) + argb[2].toString(16).padStart(2, 0);
             //return 'rgb(' + argb.join(', ') + ')';
@@ -100,7 +100,7 @@
             console.log(document.querySelector('#color-select').value );
             document.querySelector('#color-select').value = to_rgb(data['color']);
             document.querySelector("#speed").value = data['speed'].toString();
-            document.querySelector("#brigthness").value = data['brightness'].toString();
+            document.querySelector("#brigthness").value = data['brigthness'].toString();
             var active = "#radio" + data['mode'].toString();
             document.querySelector(active).setAttribute("checked", true);
         }
@@ -112,7 +112,7 @@
             transfer_on_change(key, val).then(data => {
                 update_state(data);
             });
-            
+
         }
     </script>
 </body>

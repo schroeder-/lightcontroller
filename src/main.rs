@@ -217,6 +217,9 @@ fn load_lamps() -> Arc<Mutex<LampState>> {
             Modes::from(("blue", 4, "Blue")),
             Modes::from(("blue_mode", 5, "Mood Blue")),
             Modes::from(("flame", 6, "Flame")),
+            Modes::from(("white", 7, "White")),
+            Modes::from(("color", 8, "Color")),
+            Modes::from(("orange", 9, "Orange")),
         ],
     };
     let tv_file = "tv.json";
@@ -374,7 +377,6 @@ fn rocket() -> _ {
     #[cfg(debug_assertions)]
     WriteLogger::init(LevelFilter::Warn, Config::default(), File::create("log.log").unwrap()).unwrap();
     let lamps = load_lamps();
-
     rocket::build()
         .mount("/", routes![index, index_lamp, update_lamp])
         .mount("/static", FileServer::from("static"))
