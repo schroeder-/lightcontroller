@@ -333,7 +333,7 @@ async fn update_lamp(
                     }
                 }
             }
-            "brigthness" => {
+            "brightness" => {
                 if let Ok(b) = value.parse::<u16>() {
                     if b <= 255 {
                         data.brightness = b;
